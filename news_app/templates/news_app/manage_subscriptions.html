@@ -1,0 +1,73 @@
+<!-- templates/news_app/manage_subscriptions.html -->
+{% extends 'news_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Manage Your Subscriptions</h3>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h5>Publishers</h5>
+                        <p class="text-muted">Select the publishers you want to subscribe to:</p>
+                        
+                        <div class="subscription-list border p-3">
+                            {% for publisher in publishers %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="publishers" value="{{ publisher.id }}" 
+                                           id="publisher_{{ publisher.id }}"
+                                           {% if publisher in current_publishers %}checked{% endif %}>
+                                    <label class="form-check-label" for="publisher_{{ publisher.id }}">
+                                        <strong>{{ publisher.name }}</strong>
+                                        {% if publisher.description %}
+                                            <br><small class="text-muted">{{ publisher.description }}</small>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% if not forloop.last %}<hr>{% endif %}
+                            {% empty %}
+                                <p class="text-muted">No publishers available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Journalists</h5>
+                        <p class="text-muted">Select the journalists you want to follow:</p>
+                        
+                        <div class="subscription-list border p-3">
+                            {% for journalist in journalists %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="journalists" value="{{ journalist.id }}" 
+                                           id="journalist_{{ journalist.id }}"
+                                           {% if journalist in current_journalists %}checked{% endif %}>
+                                    <label class="form-check-label" for="journalist_{{ journalist.id }}">
+                                        <strong>{{ journalist.username }}</strong>
+                                        {% if journalist.bio %}
+                                            <br><small class="text-muted">{{ journalist.bio|truncatewords:20 }}</small>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% if not forloop.last %}<hr>{% endif %}
+                            {% empty %}
+                                <p class="text-muted">No journalists available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Update Subscriptions</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

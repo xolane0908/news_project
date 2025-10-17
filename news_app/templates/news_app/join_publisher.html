@@ -1,0 +1,55 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Join Publishing House - News Application{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">Join Publishing House</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="text-center mb-4">
+                        <h4>{{ publisher.name }}</h4>
+                        {% if publisher.description %}
+                            <p class="text-muted">{{ publisher.description }}</p>
+                        {% endif %}
+                        <p><strong>Owner:</strong> {{ publisher.owner.username }}</p>
+                        <p><strong>Editors:</strong> {{ publisher.editors.count }}</p>
+                        <p><strong>Journalists:</strong> {{ publisher.journalists.count }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="alert alert-info">
+                            <p class="mb-2">You are about to join this publishing house as a <strong>{{ user.get_role_display }}</strong>.</p>
+                            {% if user.role == 'journalist' %}
+                                <p class="mb-0">Articles you publish through this publishing house will require editorial approval.</p>
+                            {% elif user.role == 'editor' %}
+                                <p class="mb-0">You will be able to review and approve articles from journalists in this publishing house.</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">Join Publishing House</button>
+                            <a href="{% url 'list_publishers' %}" class="btn btn-secondary">Back to Publishers</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

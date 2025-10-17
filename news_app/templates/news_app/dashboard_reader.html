@@ -1,0 +1,86 @@
+
+{% extends 'news_app/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2>Your Subscribed Content</h2>
+        
+        <h4 class="mt-4">Latest Articles</h4>
+        {% for article in articles %}
+            <div class="card article-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ article.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        By {{ article.journalist.username }}
+                        {% if article.publisher %}
+                            • {{ article.publisher.name }}
+                        {% endif %}
+                        • {{ article.created_at|date:"M d, Y" }}
+                    </h6>
+                    <p class="card-text">{{ article.content|truncatewords:30 }}</p>
+                    <a href="{% url 'article_detail' article.id %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-info">
+                No articles from your subscriptions. 
+                <a href="{% url 'manage_subscriptions' %}" class="alert-link">Manage your subscriptions</a> to see more content.
+            </div>
+        {% endfor %}
+
+        <h4 class="mt-4">Latest Newsletters</h4>
+        {% for newsletter in newsletters %}
+            <div class="card article-card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ newsletter.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        By {{ newsletter.created_by.username }}
+                        {% if newsletter.publisher %}
+                            • {{ newsletter.publisher.name }}
+                        {% endif %}
+                        • {{ newsletter.created_at|date:"M d, Y" }}
+                    </h6>
+                    <p class="card-text">{{ newsletter.content|truncatewords:30 }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-info">
+                No newsletters from your subscriptions.
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Your Subscriptions</h5>
+                
+                <h6>Publishers:</h6>
+                {% if subscribed_publishers %}
+                    <ul>
+                        {% for publisher in subscribed_publishers %}
+                            <li>{{ publisher.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No publishers subscribed</p>
+                {% endif %}
+                
+                <h6>Journalists:</h6>
+                {% if subscribed_journalists %}
+                    <ul>
+                        {% for journalist in subscribed_journalists %}
+                            <li>{{ journalist.username }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No journalists subscribed</p>
+                {% endif %}
+                
+                <a href="{% url 'manage_subscriptions' %}" class="btn btn-primary mt-3">Manage Subscriptions</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

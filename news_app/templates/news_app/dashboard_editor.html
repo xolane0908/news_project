@@ -1,0 +1,58 @@
+
+{% extends 'news_app/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Articles Pending Approval</h5>
+                
+                {% for article in pending_articles %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6>{{ article.title }}</h6>
+                            <p class="small">{{ article.content|truncatewords:20 }}</p>
+                            <p class="small text-muted">
+                                By: {{ article.journalist.username }}
+                                {% if article.publisher %}
+                                    • {{ article.publisher.name }}
+                                {% endif %}
+                                • {{ article.created_at|date:"M d, Y" }}
+                            </p>
+                            <a href="{% url 'approve_article' article.id %}" class="btn btn-sm btn-success">Review & Approve</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">No articles pending approval.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Recent Articles</h5>
+                
+                {% for article in all_articles %}
+                    <div class="card mb-2">
+                        <div class="card-body py-2">
+                            <h6 class="mb-1">{{ article.title }}</h6>
+                            <p class="small mb-1 text-muted">
+                                By {{ article.journalist.username }}
+                                • {{ article.created_at|date:"M d" }}
+                                {% if article.is_approved %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

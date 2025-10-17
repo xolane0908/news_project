@@ -1,0 +1,59 @@
+<!-- templates/news_app/article_detail.html -->
+{% extends 'news_app/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <article>
+                    <header class="mb-4">
+                        <h1 class="card-title">{{ article.title }}</h1>
+                        <div class="text-muted mb-3">
+                            <p class="mb-1">
+                                By <strong>{{ article.journalist.username }}</strong>
+                                {% if article.publisher %}
+                                    • Published in <strong>{{ article.publisher.name }}</strong>
+                                {% else %}
+                                    • Independent Publication
+                                {% endif %}
+                            </p>
+                            <p class="mb-0">
+                                Created: {{ article.created_at|date:"F d, Y" }}
+                                {% if article.updated_at != article.created_at %}
+                                    • Updated: {{ article.updated_at|date:"F d, Y" }}
+                                {% endif %}
+                            </p>
+                            {% if article.is_approved %}
+                                <span class="badge bg-success">Approved</span>
+                                {% if article.approved_by %}
+                                    • Approved by: {{ article.approved_by.username }}
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-warning">Pending Approval</span>
+                            {% endif %}
+                        </div>
+                    </header>
+                    
+                    <div class="article-content">
+                        {{ article.content|linebreaks }}
+                    </div>
+                    
+                    <footer class="mt-4 pt-3 border-top">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                &larr; Back to Home
+                            </a>
+                            {% if user.is_authenticated and user.role == 'editor' and not article.is_approved %}
+                                <a href="{% url 'approve_article' article.id %}" class="btn btn-success">
+                                    Approve Article
+                                </a>
+                            {% endif %}
+                        </div>
+                    </footer>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

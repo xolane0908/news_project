@@ -1,0 +1,206 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}Manage Publisher - {{ publisher.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Manage Publisher: {{ publisher.name }}</h1>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Publisher Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ publisher.name }}</p>
+                    <p><strong>Description:</strong> {{ publisher.description }}</p>
+                    <p><strong>Owner:</strong> {{ publisher.owner.username }}</p>
+                    <p><strong>Created:</strong> {{ publisher.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Current Editors</h5>
+                </div>
+                <div class="card-body">
+                    {% if current_editors %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for editor in current_editors %}
+                                        <tr>
+                                            <td>{{ editor.username }}</td>
+                                            <td>{{ editor.email }}</td>
+                                            <td>
+                                                {% if editor != publisher.owner %}
+                                                    <form method="post" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="remove_editor">
+                                                        <input type="hidden" name="editor_id" value="{{ editor.id }}">
+                                                        <button type="submit" class="btn btn-danger btn-sm" 
+                                                                onclick="return confirm('Are you sure you want to remove this editor?')">
+                                                            Remove
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Owner</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No editors assigned yet.</p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <h6>Add New Editor</h6>
+                        <form method="post" class="row g-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_editor">
+                            <div class="col-md-8">
+                                <select name="editor_username" class="form-control" required>
+                                    <option value="">Select an editor...</option>
+                                    {% for editor in available_editors %}
+                                        <option value="{{ editor.username }}">
+                                            {{ editor.username }} ({{ editor.email }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-success">Add Editor</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Current Journalists</h5>
+                </div>
+                <div class="card-body">
+                    {% if current_journalists %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for journalist in current_journalists %}
+                                        <tr>
+                                            <td>{{ journalist.username }}</td>
+                                            <td>{{ journalist.email }}</td>
+                                            <td>
+                                                <form method="post" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="remove_journalist">
+                                                    <input type="hidden" name="journalist_id" value="{{ journalist.id }}">
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="return confirm('Are you sure you want to remove this journalist?')">
+                                                        Remove
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No journalists assigned yet.</p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <h6>Add New Journalist</h6>
+                        <form method="post" class="row g-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_journalist">
+                            <div class="col-md-8">
+                                <select name="journalist_username" class="form-control" required>
+                                    <option value="">Select a journalist...</option>
+                                    {% for journalist in available_journalists %}
+                                        <option value="{{ journalist.username }}">
+                                            {{ journalist.username }} ({{ journalist.email }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-success">Add Journalist</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Pending Articles for Approval</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_articles %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Journalist</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for article in pending_articles %}
+                                        <tr>
+                                            <td>{{ article.title }}</td>
+                                            <td>{{ article.journalist.username }}</td>
+                                            <td>{{ article.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'approve_article' article.id %}" class="btn btn-primary btn-sm">
+                                                    Review & Approve
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No pending articles for approval.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
